@@ -3,7 +3,7 @@ Calculate a route collecting as many beers as possible in a given distance.
 
 The algorithm is simple:
 - We have a single parameter `scan`, which is an integer greater than 0.
-- At each step, we look at the `scan` nearest breweries which are within range.We then
+- At each step, we look at the `scan` nearest breweries which are within range. We then
   choose to visit the one which has the most beers.
 - We just keep doing that until we have to go home.
 
