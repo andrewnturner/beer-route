@@ -1,6 +1,20 @@
+"""
+Calculate a route collecting as many beers as possible in a given distance.
+
+The algorithm is simple:
+- We have a single parameter `scan`, which is an integer greater than 0.
+- At each step, we look at the `scan` nearest breweries which are within range.We then
+  choose to visit the one which has the most beers.
+- We just keep doing that until we have to go home.
+
+This script tries `scan` from 1 to 19. For this problem `3` is optimal, visiting 77
+breweries to collect 304 beer types.
+"""
+
 import numpy
 import pandas
 from haversine import haversine
+
 
 class Brewery:
     def __init__(self, brewery_id, name, beers_count, location, distances_index):
@@ -45,19 +59,21 @@ class Journey:
         print(f"Collected {beers_collected} beer types")
 
 
-
 beer_counts = pandas.read_csv("beer_counts.csv")
 distances = numpy.loadtxt("distances.csv")
 
-breweries = [Brewery(row['brewery_id'], row['name'], row['beers_count'], (row['latitude'], row['longitude']), i) for i, row in beer_counts.iterrows()]
+breweries = [
+    Brewery(row['brewery_id'], row['name'], row['beers_count'], (row['latitude'], row['longitude']), i)
+    for i, row in beer_counts.iterrows()
+]
 
-def find_journey(home_location, scan):
+def find_journey(home_location, start_fuel, scan):
     home_distances = [
         haversine(home_location, (row['latitude'], row['longitude']))
         for i, row in beer_counts.iterrows()
     ]
 
-    current_fuel = 2000
+    current_fuel = start_fuel
     beers_collected = 0
     visited = set()
 
@@ -75,8 +91,15 @@ def find_journey(home_location, scan):
 
     while current_fuel > 0:
         previous_brewery = selected_brewery
-        available_breweries = filter(lambda b: b not in visited and home_distances[b.distances_index] < current_fuel - distances[previous_brewery.distances_index, b.distances_index], breweries)
-        candidates = sorted(available_breweries, key=lambda b: distances[previous_brewery.distances_index, b.distances_index])[:scan]
+        available_breweries = filter(
+            lambda b: (b not in visited) and
+                (home_distances[b.distances_index] < current_fuel - distances[previous_brewery.distances_index, b.distances_index]),
+            breweries
+        )
+        candidates = sorted(
+            available_breweries,
+            key=lambda b: distances[previous_brewery.distances_index, b.distances_index]
+        )[:scan]
         
         if not candidates:
             break
@@ -95,13 +118,16 @@ def find_journey(home_location, scan):
     return journey
 
 if __name__ == "__main__":
+    # (longitude, latitude) of where to start and end.
     home_location = (51.355468, 11.100790)
+    # Maximum distance to travel in kilometres.
+    start_fuel = 2000
     
     best_journey = None
     best_score = 0
     best_scan = None
     for i in range(1, 20):
-        journey = find_journey(home_location, i)
+        journey = find_journey(home_location, start_fuel, i)
         if journey.score() > best_score:
             best_journey = journey
             best_score = journey.score()

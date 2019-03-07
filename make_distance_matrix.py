@@ -1,4 +1,4 @@
-"""Calculate the distance matrix and save it to a file."""
+"""Calculate the distance in kilometres between each brewery and save the matrix to a file."""
 
 import numpy
 import pandas
@@ -9,7 +9,6 @@ breweries_count = len(beer_counts)
 
 distances = numpy.zeros((breweries_count, breweries_count))
 for i, i_row in beer_counts.iterrows():
-    print(i)
     point_i = (i_row['latitude'], i_row['longitude'])
     for j, j_row in beer_counts.iterrows():
         point_j = (j_row['latitude'], j_row['longitude'])
