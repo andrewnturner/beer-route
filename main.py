@@ -7,9 +7,11 @@ The algorithm is simple:
   choose to visit the one which has the most beers.
 - We just keep doing that until we have to go home.
 
-This script tries `scan` from 1 to 19. For this problem `3` is optimal, visiting 77
+The script tries `scan` from 1 to 9. For this problem `3` is optimal, visiting 77
 breweries to collect 304 beer types.
 """
+
+import time
 
 import numpy
 import pandas
@@ -122,19 +124,26 @@ if __name__ == "__main__":
     home_location = (51.355468, 11.100790)
     # Maximum distance to travel in kilometres.
     start_fuel = 2000
+
+    start = time.time()
     
     best_journey = None
     best_score = 0
     best_scan = None
-    for i in range(1, 20):
+    for i in range(1, 10):
         journey = find_journey(home_location, start_fuel, i)
         if journey.score() > best_score:
             best_journey = journey
             best_score = journey.score()
             best_scan = i
 
+    end = time.time()
+
     print(f"Scan {best_scan}")
     print("")
     best_journey.print_out()
+
+    print("")
+    print(f"Program took {end-start}s")
         
     
